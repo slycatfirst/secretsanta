@@ -9,49 +9,55 @@ app.use(express.static("public"));
 
 const DATA_FILE = "./data.json";
 
-// Загружаем данные
 function loadData() {
   return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
 }
 
-// Сохраняем данные
 function saveData(data) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf8");
 }
 
-// Получить количество оставшихся участников
-app.get("/remaining", (req, res) => {
+// Получить список участников
+app.get("/participants", (req, res) => {
   const data = loadData();
-  res.json({ count: data.available.length });
+  res.json({ participants: data.participants });
 });
 
-// Выбрать случайного участника
+// Выбрать случайного, исключив себя
 app.post("/pick", (req, res) => {
+  const { user } = req.body;
+
+  if (!user) return res.json({ error: "Не указано имя пользователя" });
+
   const data = loadData();
 
-  if (data.available.length === 0) {
-    return res.json({ error: "Участники закончились" });
+  // Фильтруем доступных так, чтобы исключить самого пользователя
+  const filtered = data.available.filter(name => name !== user);
+
+  if (filtered.length === 0) {
+    return res.json({ error: "Нет доступных участников (кроме тебя)" });
   }
 
-  // Случайный выбор
-  const index = Math.floor(Math.random() * data.available.length);
-  const chosen = data.available[index];
+  const index = Math.floor(Math.random() * filtered.length);
+  const chosen = filtered[index];
 
-  // Удаляем из списка доступных
-  data.available.splice(index, 1);
+  // Удаляем выбранного из доступных
+  const globalIndex = data.available.indexOf(chosen);
+  if (globalIndex !== -1) {
+    data.available.splice(globalIndex, 1);
+  }
 
-  // Сохраняем в файл
   saveData(data);
 
-  res.json({ picked: chosen, remaining: data.available.length });
+  res.json({ picked: chosen });
 });
 
-// Сброс (опционально — удалить когда закончите тестирование)
+// Сброс
 app.post("/reset", (req, res) => {
   const data = loadData();
   data.available = [...data.participants];
   saveData(data);
-  res.json({ success: true, available: data.available.length });
+  res.json({ success: true });
 });
 
 const port = process.env.PORT || 3000;

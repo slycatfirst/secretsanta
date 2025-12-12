@@ -31,10 +31,19 @@
 
     h1 {
       margin-top: 0;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       font-size: 24px;
       font-weight: 600;
       color: #333;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     button {
@@ -62,7 +71,6 @@
       min-height: 32px;
     }
 
-    /* Адаптация для маленьких экранов */
     @media (max-width: 480px) {
       .container {
         padding: 22px 20px;
@@ -70,13 +78,11 @@
 
       h1 {
         font-size: 22px;
-        margin-bottom: 20px;
       }
 
       button {
         padding: 12px;
         font-size: 16px;
-        border-radius: 8px;
       }
 
       #result {
@@ -90,20 +96,50 @@
   <div class="container">
     <h1>Secret Santa</h1>
 
+    <select id="user">
+      <option value="">Ваше имя...</option>
+    </select>
+
     <button onclick="pick()">Выбрать случайного участника</button>
 
     <p id="result"></p>
   </div>
 
   <script>
+    // Загружаем список участников
+    fetch("/participants")
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById("user");
+        data.participants.forEach(name => {
+          const opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = name;
+          select.appendChild(opt);
+        });
+      });
+
     async function pick() {
-      const res = await fetch("/pick", { method: "POST" });
+      const user = document.getElementById("user").value;
+
+      if (!user) {
+        document.getElementById("result").textContent = "Выберите своё имя!";
+        return;
+      }
+
+      const res = await fetch("/pick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user })
+      });
+
       const data = await res.json();
 
       if (data.error) {
         document.getElementById("result").textContent = data.error;
       } else {
-        document.getElementById("result").textContent = "Выпал: " + data.picked;
+        document.getElementById("result").textContent =
+          "Ваш Secret Santa: " + data.picked;
       }
     }
   </script>
