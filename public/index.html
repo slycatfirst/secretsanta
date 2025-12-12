@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Secret Santa</title>
 
   <style>
@@ -13,7 +14,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
 
     .container {
@@ -22,7 +23,10 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.12);
       text-align: center;
-      width: 350px;
+      width: 100%;
+      max-width: 360px;
+      box-sizing: border-box;
+      margin: 20px;
     }
 
     h1 {
@@ -37,11 +41,13 @@
       background: #d62828;
       color: #fff;
       border: none;
-      padding: 12px 22px;
-      border-radius: 8px;
+      padding: 14px 26px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       transition: background 0.2s ease;
+      width: 100%;
+      max-width: 250px;
     }
 
     button:hover {
@@ -54,6 +60,28 @@
       font-weight: bold;
       color: #333;
       min-height: 32px;
+    }
+
+    /* Адаптация для маленьких экранов */
+    @media (max-width: 480px) {
+      .container {
+        padding: 22px 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+      }
+
+      #result {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
