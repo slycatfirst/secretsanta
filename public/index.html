@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Secret Santa</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      text-align: center;
+      width: 350px;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 25px;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    button {
+      background: #d62828;
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #b71f1f;
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      min-height: 32px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Secret Santa</h1>
+
+    <button onclick="pick()">Выбрать случайного участника</button>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    async function pick() {
+      const res = await fetch("/pick", { method: "POST" });
+      const data = await res.json();
+
+      if (data.error) {
+        document.getElementById("result").textContent = data.error;
+      } else {
+        document.getElementById("result").textContent = "Выпал: " + data.picked;
+      }
+    }
+  </script>
+</body>
+</html>
